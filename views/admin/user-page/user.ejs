@@ -1,0 +1,132 @@
+<% include ../partials/header %>
+
+<style>
+    .vertical-line {
+        border-right: 1px solid rgba(200,200,200, .7);
+    }
+
+    .pointer{
+        cursor: pointer;
+    }
+</style>
+
+<script src="/js/user.js"></script>
+<script>
+    function enableUser(userId) {
+        $.ajax({
+        type: 'POST',
+        url: '/admin/user/' + userId + '/update/isDisabled/false',
+        success: function(response) { 
+            location.reload();
+        },
+        });
+    }
+</script>
+
+    <!-- Modal for deleting user - ONLY SHOWN WHEN "Slet" IS CLICKED -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bekræft valg</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="pointer" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Er du sikker på, at du vil slette <%= user.firstName + " " + user.lastName %> permanent?</p>
+                <p>Denne handling kan <strong>ikke</strong> fortrydes.</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/admin/delete/<%= user._id%>" method="POST">
+                    <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Fortryd</button>
+                    <button class="btn btn-danger pointer">Slet</button>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for deactivating user - ONLY SHOWN WHEN "Deaktivér" IS CLICKED -->
+    <div class="modal fade" id="deactivateUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bekræft valg</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="pointer" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Er du sikker på, at du vil deaktivere <%= user.firstName + " " + user.lastName %>?</p>
+                <p>Du kan altid fortryde dit valg senere.</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/admin/user/<%= user._id %>/update/isDisabled/true" method="POST">
+                    <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Fortryd</button>
+                    <button class="btn btn-danger pointer">Deaktivér</button>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <div class="row">
+                <div class="col-9">
+                    <h4 class="mb-0"> <%= user.firstName  %> </h4>
+                </div>
+                <div class="col-3">
+                    <div class="btn-group float-right">
+                        <% if(!user.isDisabled) { %>
+                            <button class="btn bg-primary border-white text-white pointer" data-toggle="modal" data-target="#deactivateUserModal">Deaktivér</button>
+                            <button class="btn bg-primary border-white text-white pointer" data-toggle="modal" data-target="#deleteUserModal">Slet</button>
+                        <% } else { %>
+                            <div class="btn-group float-right">
+                                <form action="/admin/user/<%= user._id %>/update/isDisabled/false" method="POST">
+                                    <button class="btn bg-primary border-white text-white pointer">Aktivér</button>
+                                </form>
+                            </div>
+                            <button class="btn bg-primary border-white text-white pointer" data-toggle="modal" data-target="#deleteUserModal">Slet</button>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-9">
+                    <div class="row">
+                        <div class="col-2">
+                            <p><strong>Fulde navn:</strong></p>
+                            <p><strong>Adresse:</strong></p>
+                            <p><strong>E-mail:</strong></p>
+                            <p><strong>Telefon:</strong></p>                    
+                        </div>
+                        <div class="col-5">
+                            <p><%= user.firstName + " " + user.lastName %> </p>
+                            <p><%= user.address %>, <%= user.zipcode + " " + user.town %></p>
+                            <p><%= user.username %></p>
+                            <p><%= user.phone %></p>                    
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <img src="<%= user.avatarURL %>" width="200">
+                </div>
+            </div>
+            <a href="<%= user._id %>/chat" class="btn btn-outline-success">Chat med <%= user.firstName %> </a>
+        </div>
+    </div>
+
+    <% include user-weight %>
+
+    <% include user-training %>
+
+    <% include user-meal-plan %>
+
+</div>
+
+<% include ../partials/footer %>

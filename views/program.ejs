@@ -1,0 +1,113 @@
+<% include partials/header %>
+<% let trainingStats = user.trainingStats; %>
+
+<script>
+    $("#program").addClass("active");
+    $("#title").text("Program");
+</script>
+
+<!-- Load Facebook SDK for JavaScript -->
+<script>(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+
+<% workouts.forEach((workout) => { %>
+    <!-- Modal for each workout -->
+    <div class="modal fade" id="workoutModal<%= workout.name.replace(/\s/g, '') %>" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-capitalize" id="exampleModalLabel"><%= workout.name %></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="pointer" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="fb-root"></div>
+                        <!-- Your embedded video player code -->
+                        <div class="fb-video" data-href="<%= workout.videoUrl %>" data-width="300" data-show-text="false">
+                            <div class="fb-xfbml-parse-ignore">
+                                <blockquote cite="<%= workout.videoUrl %>">
+                                    <a href="<%= workout.videoUrl %>">How to Share With Just Friends</a>
+                                    <!-- <p>How to share with just friends.</p>
+                                    Posted by <a href="https://www.facebook.com/facebook/">Facebook</a> on Friday, December 5, 2014-->
+                                </blockquote>
+                            </div>
+                        </div> 
+                    </div>
+                    <p class="mx-3"><%= workout.description %> </p>
+                </div>
+            </div>
+        </div>
+    </div>
+<% }); %>
+
+
+<% trainingStats.trainingPases.forEach((trainingPas) => { %>
+    <div class="card mx-0 my-4">
+        <div class="card-header text-white bg-primary py-0">
+            <div class="row">
+                <div class="col-9 pb-0 pt-2">
+                    <h5>
+                        <span class="vertical-line pr-2"> Pas <%= trainingPas.pasNumber %> </span> 
+                        Trænet <span id="timesTrained<%=trainingPas.pasNumber%>"><%= trainingPas.timesTrained %></span> gange
+                    </h5>
+                </div>
+                <div class="col-3 pb-0">
+                    <span class="float-right pt-2">
+                        <button class="btn bg-primary text-white p-0" onclick="updateTimesTrained('<%=trainingPas.pasNumber%>','false')">
+                            <i class="fa fa-lg fa-arrow-down mr-1" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn bg-primary text-white p-0" onclick="updateTimesTrained('<%=trainingPas.pasNumber%>','true')">
+                            <i class="fa fa-lg fa-arrow-up" aria-hidden="true"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    
+        <div class="card-body pt-0">
+            <% let i = 0; trainingPas.muscleGroups.forEach((muscleGroup) => { %>
+            <% if(i !== 0){ %>
+                <hr>
+            <% } i += 1; %>
+            <h5 class="mt-4 text-capitalize ml-2"> <%= muscleGroup.name %> </h5>
+            <div class="list-group list-unstyled" style="position: relative;">
+                <% muscleGroup.assignedWorkouts.forEach((workout) => { %>
+
+                    <!-- Button to toggle modal -->
+                    <button type="button" class="btn btn-sm btn-link mt-1" data-toggle="modal" data-target="#workoutModal<%= workout.name.replace(/\s/g, '') %>">
+                        <span class="float-left text-capitalize"> <%= workout.name %> </span> 
+                        <span class="float-right"> <%= workout.saet %> sæt af <%= workout.reps %> gentagelser </span>
+                    </button>
+
+                <% }) %>
+            </div>
+        <% }) %>
+        </div>        
+    </div>
+<% }) %>
+
+<script>
+    function updateTimesTrained(trainingPas, increase){
+    $.ajax({
+    type: 'POST',
+    url: 'update/trainingpas/timesTrained/' + increase,
+    data: {
+        trainingPas: trainingPas,
+        increase: increase
+    },
+    success: function(response) { 
+            const updatedTimesTrained = response.updatedTimesTrained;
+            $("#timesTrained" + trainingPas).text(updatedTimesTrained);
+        }
+    });
+}
+</script>
+
+<% include partials/footer %>

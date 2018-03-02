@@ -1,0 +1,36 @@
+<!-- Vægt -->
+<div class="row my-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="row">
+                        <div class="col-5">
+                            <h4 class="mb-0">Vægt</h4>
+                        </div>
+                        <div class="col-7">
+                            <form class="form-inline float-right" action="<%= user._id %>/update/weight" method="post">
+                                <div class="form-group">
+                                    <input name="newGoal" required type="number" class="form-control mr-1" placeholder="indtast ny målvægt...">
+                                    <button type="submit" class="btn btn-primary pointer">
+                                            <i class="fa fa-lg fa-pencil" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 vertical-line">
+                            <p class="my-1"> Mål vægt <span class="float-right"> <%= user.weightStats.targetWeight %>kg </span> </p>        
+                            <p class="my-1"> Start vægt <span class="float-right"> <%= user.weightStats.startWeight %>kg </span> </p>                                              
+                        </div>
+                        <div class="col-6">
+                            <p class="my-1"> Nuværende vægt <span class="float-right"> <%= user.weightStats.currentWeight %>kg </span> </p>
+                            <p class="my-1"> Vægt progression <span class="float-right"> <%= user.weightStats.weightProgress.toFixed(1) %>kg </span> </p>
+                        </div>
+                    </div>               
+                </div>
+            </div>
+        </div>
+    </div>

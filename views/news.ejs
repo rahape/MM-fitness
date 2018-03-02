@@ -1,0 +1,38 @@
+<% include partials/header %>
+<script>
+    $("#news").addClass("active");
+    $("#title").text("Nyheder");
+
+    function swapText(id){
+        let text = $("#" + id).text();
+        
+        if(text == "Læs mindre..."){
+            $("#" + id).text("Læs mere...");
+        } else{
+            $("#" + id).text("Læs mindre...");
+        }
+    }
+</script>
+
+    <div class="container px-0">
+        <% news.forEach((news) => { %>
+            <div class="card my-4">
+                <div class="card-header bg-primary text-white py-2">
+                    <h4><%= news.title %></h4>
+                </div>
+                <div class="card-body pb-2">
+                    <p><i> <%= news.subdivision %> </i></p>
+                    <a id="<%= news._id %>__" class="my-1 text-black" data-toggle="collapse" href="#<%= news._id %>" 
+                        aria-expanded="false" aria-controls="<%= news._id %>" onclick="swapText('<%= news._id %>__')">
+                        Læs mere...
+                    </a>
+                    <div class="collapse mt-2" id="<%= news._id %>">
+                        <p class="card-text"><%= news.content %></p>
+                        <a href="<%= news.link %>" target="_blank"><%= news.linkText %></a>
+                    </div>
+                    <p class="text-right m-1 text-secondary"><small><%= news.date %></small></p>
+                </div>
+            </div>
+        <%});%>
+    </div>
+<% include partials/footer %>

@@ -1,0 +1,95 @@
+<% include partials/header %>
+
+<script>
+function search(){
+    let listItem;
+    let input = document.getElementById('searchField');
+    let search = input.value.toUpperCase();
+    let ul = document.getElementById('workoutList');
+    let li = ul.getElementsByTagName('li');
+
+    for (i = 0; i < li.length; i++) {
+        /* Find each workout tag */
+        listItem = li[i].getElementsByTagName("a")[0];
+        /* If contains the input = show */
+        if (listItem.innerHTML.toUpperCase().indexOf(search) > -1) {
+            li[i].style.display = "";
+        } else {
+            /* If does not contain the input = hide */
+            li[i].style.display = "none";
+        }
+    }
+}
+</script>
+
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            <input class="form-control my-3" type="text" id="searchField" onkeyup="search()" placeholder="Søg efter øvelser...">
+        </div>
+        <div class="col-2">
+            <div class="float-right my-3">
+                <button type="submit" class="btn btn-outline-success pointer" data-toggle="modal" data-target="#modalWorkout">Opret øvelse</button>
+            </div>
+        </div>
+    </div>
+
+
+<!-- MODAL -->
+<div class="modal fade" id="modalWorkout" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Opret øvelse</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form action="/admin/workouts/create" method="POST">
+                <div class="form-group">
+                    <label>Navn <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="name">
+                </div>
+                <div class="form-group">
+                    <label>VideoUrl <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="videoUrl">
+                </div>
+                <div class="form-group">
+                    <label>Beskrivelse <span class="text-danger">*</span></label>
+                    <textarea type="text" class="form-control" name="description" cols="30" rows="10"></textarea>
+                </div>
+                <div class="float-right my-2">
+                    <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary pointer">Opret øvelse</button>
+                </div>
+            </form> 
+        </div>
+        </div>
+    </div>
+</div>
+
+    
+    
+    <ul id="workoutList" class="list-group">
+        <% workouts.forEach((workout) => { %>
+            <li class="list-group-item">
+                <form action="/admin/workouts/update" method="POST">
+                    <a class="btn-link text-capitalize" data-toggle="collapse" href="#collapse<%= workout._id %>" role="button" aria-expanded="false" aria-controls="collapse<%= workout._id %>"><%= workout.name %></a>
+                    <div id="collapse<%= workout._id %>" class="collapse">
+                        <input name="name"style="display: none" value="<%= workout.name %>">
+                        <hr>
+                        <label><strong>Video URL:</strong></label>
+                        <input type="text" name="videoUrl" class="form-control mb-2" value="<%= workout.videoUrl %>">
+                        <label><strong>Beskrivelse:</strong></label>
+                        <textarea class="form-control mb-2" name="description" rows="10"> <%= workout.description %> </textarea>
+                        <button class="btn btn-outline-primary pointer float-right" type="submit"> Gem </button>
+                        <a class="btn btn-outline-danger pointer float-right mr-2" href="/admin/workouts/delete/<%= workout._id %>"> Slet </a>
+                    </div>
+                </form>
+            </li>
+        <% }) %>
+    </ul>
+</div>
+
+<% include partials/footer %>

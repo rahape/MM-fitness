@@ -1,0 +1,140 @@
+<% include partials/header %>
+
+<script>
+    $("#news").addClass("active");
+</script>
+
+<!-- MODAL -->
+<div class="modal fade" id="modalNews" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Opret nyhed</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form action="/admin/news/create" method="POST">
+                <div class="form-group">
+                    <label>Titel <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="title">
+                </div>
+                <div class="form-group">
+                    <label>Rubrik <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="subdivision">
+                </div>
+                <div class="form-group">
+                    <label>Tekst <span class="text-danger">*</span></label>
+                    <textarea type="text" class="form-control" name="content" cols="30" rows="10"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Link</label>
+                    <input type="text" class="form-control" name="link" placeholder="f.eks http://www.google.com">
+                </div>
+                <div class="form-group">
+                    <label>Link-tekst</label>
+                    <input type="text" class="form-control" name="linkText" placeholder="f.eks Google">
+                </div>
+                <div class="float-right my-2">
+                    <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary pointer">Opret nyhed</button>
+                </div>
+            </form> 
+        </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL BUTTON -->
+<div class="row mx-3 my-3">
+    <div class="col-12">
+        <button class="btn btn-md btn-outline-success float-right pointer" data-toggle="modal" data-target="#modalNews">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> Opret nyhed
+        </button>  
+    </div>
+</div>
+
+
+<!-- NEWS LIST -->
+<div class="row mx-3">
+    <% news.forEach((news) => { %>
+        <!-- Modal for deleting news - ONLY SHOWN WHEN "X" IS CLICKED ON SPECIFIC NEWS -->
+        <div class="modal fade" id="deleteNewsModal<%= news._id %>" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bekræft valg</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="pointer" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Er du sikker på, at du vil slette den valgte nyhed?</p>
+                    <p>Denne handling kan <strong>ikke</strong> fortrydes.</p>
+                </div>
+                <div class="modal-footer">
+                    <form action="/admin/news/delete/<%= news._id %>" method="POST">
+                        <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Fortryd</button>
+                        <button class="btn btn-danger pointer">Slet</button>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEWS CARDS -->
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="mb-0"><%= news.title %></h5>
+                        </div>
+                        <div class="col-6">
+                            <button  class="btn p-0 m-0 btn-sm btn-primary float-right pointer" data-toggle="modal" data-target="#deleteNewsModal<%= news._id %>">
+                                <i class="fa fa-lg  fa-times" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pb-2">
+                    <p><i> <%= news.subdivision %> </i></p>
+                    <a id="<%= news._id %>__" class="my-1 text-black" data-toggle="collapse" href="#<%= news._id %>" 
+                        aria-expanded="false" aria-controls="<%= news._id %>" onclick="swapText('<%= news._id %>__')">
+                        Læs mere...
+                    </a>
+                        <div class="collapse mt-2" id="<%= news._id %>">
+                            <p class="card-text"><%= news.content %></p>
+                            <a href="<%= news.link %>" target="_blank"><%= news.linkText %></a>
+                        </div>
+                    <p class="text-right m-1 text-secondary"><small><%= news.date %></small></p>
+                </div>
+            </div>
+        </div>
+    <%});%>
+</div>
+
+<script>
+    function swapText(id){
+        let text = $("#" + id).text();
+        
+        if(text == "Læs mindre..."){
+            $("#" + id).text("Læs mere...");
+        } else{
+            $("#" + id).text("Læs mindre...");
+        }
+    }
+
+    function deleteNews(newsId) {
+        $.ajax({
+            type: 'POST',
+            url: '/admin/news/delete/' + newsId,
+            success: function(respones) {
+                window.location.replace("/admin/news");
+            }
+        });
+    }
+</script>
+
+<% include partials/footer %>

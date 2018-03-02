@@ -1,0 +1,129 @@
+<% include partials/header %>
+
+<script>
+    $("#home").addClass("active");
+</script>
+
+<div class="modal fade" id="registerUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Registrér ny bruger</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span class="pointer" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/admin/register" method="POST">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Fornavn <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="firstName" placeholder="fornavn" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Efternavn <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="lastName" placeholder="efternavn" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>E-mail <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" name="username" placeholder="e-mail" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" name="password" placeholder="password" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label>Adresse <span class="text-danger">*</span></label>
+                            <input type="text" name="address" class="form-control" placeholder="adresse" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Postnummer <span class="text-danger">*</span></label>
+                            <input type="text" name="zipcode" class="form-control" placeholder="postnummer" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>By <span class="text-danger">*</span></label>
+                            <input type="text" name="town" class="form-control" placeholder="by" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Telefon <span class="text-danger">*</span></label>
+                            <input type="text" name="phone" class="form-control" placeholder="telefon" required>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="float-right">
+                        <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Fortryd</button>
+                        <button class="btn btn-primary pointer">Registrér</button>
+                    </div>
+                </form> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mx-3 my-3">
+    <div class="col-4">
+        <div class="btn-group ">
+            <button type="button" class="btn btn-outline-primary dropdown-toggle pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <%= sorted %>
+            </button>
+            <div class="dropdown-menu">    
+                <h6 class="dropdown-header">Sortér efter</h6>    
+                <a class="dropdown-item" href="/admin/dashboard/firstName">Fornavn</a>
+                <a class="dropdown-item" href="/admin/dashboard/lastName">Efternavn</a>
+                <a class="dropdown-item" href="/admin/dashboard/lastEdit">Sidst redigeret</a>
+                <a class="dropdown-item" href="/admin/dashboard/dateCreated">Nyeste</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-8">
+        <button type="button" class="btn btn-md btn-outline-success float-right pointer" data-toggle="modal" data-target="#registerUserModal">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> Opret bruger
+        </button>
+    </div>
+</div>
+ 
+
+<div class="row mx-3">
+    <% users.forEach((user) => { %>
+        <% if(user.isAdmin){} else { %>
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <% if(user.isDisabled){ %>
+                    <div class="card mb-4 isDisabled">
+                        <div class="card-header bg-secondary text-white">
+                <% } else { %>
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                <% } %>
+                        <h5 class="mb-0"><%= user.firstName + " " + user.lastName %> 
+                            <% if(user.lastEdit !== "") { %>
+                                <span class="float-right"> 
+                                    <small> sidst ændret <%= user.lastEdit %> 
+                                    </small> 
+                                </span>
+                            <% } %>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <% if(user.weightStats.currentWeight) { %>
+                            <p> Nuværende vægt <span class="float-right"> <%= user.weightStats.currentWeight %>kg </span> </p>
+                            <p> Vægt progression <span class="float-right"> <%= user.weightStats.weightProgress.toFixed(1) %>kg </span> </p>
+                            <p> Mål vægt <span class="float-right"> <%= user.weightStats.targetWeight %>kg </span> </p>                    
+                        <% } else { %>
+                            <p> Brugeren har ikke indtastet data </p>
+                        <% } %>
+                        <a href="/admin/user/<%= user._id %>/chat" class="btn btn-sm btn-outline-success">Chat med bruger</a>
+                        <a href="/admin/user/<%= user._id %>" class="btn-sm btn-link float-right">Detaljer</a>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    <% }); %>
+</div>
+
+<% include partials/footer %>

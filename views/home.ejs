@@ -1,0 +1,228 @@
+<% include partials/header %>
+
+<script src="skycons/skycons.js"></script>
+
+<script>
+	$("#home").addClass("active");
+	$("#title").text("Hjem");
+
+    function updateCalories(mealId) {
+
+        let checkButton = $("." + mealId);
+        checkButton.prop("disabled", true);
+
+        const url = "/meal-plan/update/<%=user._id%>/mealId/" + mealId;
+        let caloriesToday = $("#caloriesToday");
+        $.ajax({
+            url: url,
+            type: 'post',
+        })
+        .done(function( data ) {
+			caloriesToday.html(data.newCalories);
+			location.reload();
+        });
+	}
+
+	function swapText(id){
+        let text = $("#" + id).text();
+        
+        if(text == "Færre oplysninger"){
+            $("#" + id).text("Flere oplysninger");
+        } else{
+            $("#" + id).text("Færre oplysninger");
+        }
+    }
+</script>
+
+
+
+<div>		
+	<div id="weatherCard" class="card mx-0 my-4">
+		<div class="card-header bg-warning text-white py-1 ">
+			<div class="row">
+				<div class="col-10">
+					<h6 class="my-2 "><%= currentWeather.summary %>, <%= currentWeather.temperature %>° degrees
+						<span class="float-right">
+						</span> 
+					</h6>
+				</div>
+				<div class="col-2 pr-2">
+					<canvas class="float-right"  id="icon1" width="35" height="35"></canvas>
+				</div>
+			</div>
+		</div>
+		<div class="card-body py-1">
+			<a id="weatherToggleLink" class="btn btn-link pl-0" onclick="swapText('weatherToggleLink')" data-toggle="collapse" href="#weatherToggle" aria-expanded="false" aria-controls="weatherToggle">
+				Flere oplysninger
+			</a>
+			<div class="collapse" id="weatherToggle">
+				<hr class="mt-2">
+				<h6>Today:</h6>
+				<label><%= weatherToday.summary %></label>
+				<label>Max temperature: <%= weatherToday.temperatureMax %>°</label>
+				<h6>Tomorrow:</h6>
+				<label><%= weatherTomorrow.summary %></label>
+				<label>Max temperature: <%= weatherTomorrow.temperatureMax %>°</label>
+			</div> 
+		</div>
+	</div>
+
+<% if(nextMeal.name) { %>
+	<!-- MEAL CARD -->
+	<div class="card mx-0 my-4">
+		<div class="card-header bg-success text-white">
+			<h6 class="mb-0"> 
+				<%= user.foodStats.mealPlan.caloriesToday %> kalorier tilbage ud af <%= user.foodStats.mealPlan.totalCalories %>
+				<i class="fa fa-lg fa-cutlery float-right" aria-hidden="true"></i>
+			</h6>		
+		</div>
+		<div class="card-body py-2 pr-3">
+			<p class="mb-0">Næste måltid: <%= nextMeal.name %>
+				<span>
+					<button class="mr-0 btn btn-sm btn-outline-success float-right submit <%= nextMeal.id %>" onclick="updateCalories(<%= nextMeal.id %>)">
+						<i class="fa fa-check fa-lg" aria-hidden="true"></i>
+					</button>
+				</span>
+			</p>
+		</div>
+	</div>
+<% } else { %>
+	<!-- MEAL CARD -->
+	<div class="card mx-0 my-4">
+		<div class="card-header bg-success text-white">
+			<h6 class="mb-0"> Du har spist alle dine måltider i dag 
+				<span class="ml-1">
+					<i class="fa fa-lg fa-thumbs-o-up float-right" aria-hidden="true"></i>						
+				</span>  
+			</h6>
+		</div>
+		<div class="card-body py-2">
+			<h6> I dag har du indtaget: </h6>
+			<p class="mb-0"> Kalorier <span class="float-right"> <%= user.foodStats.mealPlan.totalCalories %> kcal  </span> </p>
+			<p class="mb-0"> Kulhydrater <span class="float-right"> <%= user.foodStats.mealPlan.totalCarbohydrates %>g  </span> </p>
+			<p class="mb-0"> Fedt <span class="float-right"> <%= user.foodStats.mealPlan.totalFat %>g  </span> </p>
+			<p class="mb-0"> Protein <span class="float-right"> <%= user.foodStats.mealPlan.totalProtein %>g  </span> </p>
+		</div>
+	</div>
+<% } %>
+
+<!-- WEIGHT CARD -->
+	<div class="card mx-0 my-4">
+		<div class="card-header bg-primary text-white">
+			<h6 class="mb-0">
+				Nuværende vægt: <%= user.weightStats.currentWeight %>kg
+				<i class="fa fa-lg float-right fa-area-chart" aria-hidden="true"></i>
+			</h6>
+		</div>
+		<div class="card-body">
+			<form action="/update/weight" method="POST">
+				<div class="form-row">
+					<div class="form-group col-8">
+						<input class="form-control" type="number" name="weight" placeholder="Nuværende vægt" required step="0.1"/>
+					</div>
+					<div class="form-group col-4">
+						<input class="form-control btn btn-outline-primary" type="submit"/>	
+					</div>
+				</div>
+			</form>
+			<a id="weightToggleLink" class="btn btn-link pl-0" onclick="swapText('weightToggleLink')" data-toggle="collapse" href="#weightToggle" aria-expanded="false" aria-controls="weatherToggle">
+				Flere oplysninger
+			</a>
+			<div class="collapse" id="weightToggle">
+				<% if(user.weightStats.weightProgress != null && user.weightStats.weightProgress != 0){ %>
+					<% if(user.weightStats.weightProgress < 0){ %>
+						<p>Du har taget <%= Math.abs(user.weightStats.weightProgress).toFixed(1) %>kg på siden du startede</p>
+					<% } else { %>
+						<p>Du har tabt dig <%= Math.abs(user.weightStats.weightProgress).toFixed(1) %>kg siden du startede</p>
+					<% } %>
+				<% } %>	
+				<canvas id="myChart" width="100" height="80"></canvas>
+			</div>
+		</div>
+	</div>
+
+	<% 
+	let totalTimesTrained = 0;
+	user.trainingStats.trainingPases.forEach((pas) => {
+		totalTimesTrained += pas.timesTrained;
+	});
+	%>
+	<div class="card mx-0 my-4">
+		<div class="card-header bg-danger text-white">
+			<h6 class="mb-0">
+				I denne uge har du trænet <%= totalTimesTrained %> gange
+			</h6>
+		</div>
+		<div class="card-body">
+			<% user.trainingStats.trainingPases.forEach((pas) => { %>
+				<p> Pas <%= pas.pasNumber %> <span class="float-right"><%= pas.timesTrained %> gange </span></p>
+			<% }) %>
+			
+		</div>
+	</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
+<script>
+
+	var ctx = $("#myChart");
+
+	var myChart = new Chart(ctx, {
+		type: 'line',
+		data: {
+
+			<% 
+			let weightDates = []
+			let allWeights = []
+
+			user.weightStats.allWeights.forEach((weight) => {
+				weightDates.push(JSON.stringify(weight.date));
+				allWeights.push(weight.weight);
+			}); 
+
+			%>
+
+			labels: [<%- weightDates %>],
+			datasets: [{
+				label: '# Vægt',
+				data: [<%= allWeights %>],
+				backgroundColor: [
+					'rgba(2,117,216, .7)',
+				],
+				borderColor: [
+					'rgba(0, 0, 0, 0.5)',
+				],
+				borderWidth: 1,
+				fill: true
+			}],
+		},
+		options: {
+			scales: {
+				yAxes: [{
+					ticks: {
+						beginAtZero:false
+					}
+				}]
+			}
+		}
+	});
+
+
+</script>
+
+<script>
+	var skycons = new Skycons({"color": "white"});
+	
+	<% 
+	let test = currentWeather.icon.replace("&#34", "") 
+	test = test.replace("-", "_").toUpperCase();
+	test = test.replace("-", "_");
+	%>
+	skycons.add("icon1", Skycons.<%= test %>);
+	skycons.play();
+	
+</script>
+	
+
+<% include partials/footer %>

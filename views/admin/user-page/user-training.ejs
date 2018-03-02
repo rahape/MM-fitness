@@ -1,0 +1,290 @@
+<script>
+    $( document ).ready( () => {
+        if(document.cookie) {
+            toggleEditButtons(document.cookie);
+        }
+    } );
+</script>
+
+<!-- Træning -->
+<div class="row my-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <div class="row">
+                    <div class="col-9">
+                        <h4>Træningsprogram</h4>
+                    </div>
+                    <div class="col-3">
+                        <button class="btn btn-primary float-right pointer" onclick="createPas()">
+                            <i class="fa fa-lg fa-plus" aria-hidden="true"></i> 
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <% user.trainingStats.trainingPases.forEach((trainingPas) => { %>
+                        <div class="col-6">
+                            <div class="card border m-1 my-4">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <h5>
+                                                Pas <%= trainingPas.pasNumber %> 
+                                            </h5>
+                                        </div>
+                                        <div class="col-4">
+                                            <button  class="btn text-success btn-light float-right pointer p-1" onclick="toggleEditButtons('<%= trainingPas.pasNumber %>')" >
+                                                <i class="fa fa-lg fa-pencil" aria-hidden="true"></i>
+                                            </button> 
+                                            
+                                            <!-- MODAL THAT'S ONLY SHOWN WHEN USER WANTS TO DELETE SPECIFIC PAS -->
+                                            <div class="modal fade" id="deleteTrainingPasModal<%= trainingPas.pasNumber %>" role="dialog" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title text-dark">Bekræft valg</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span class="pointer" aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p class="text-dark">Er du sikker på, at du vil slette det valgte pas?</p>
+                                                            <p class="text-dark">Denne handling kan <strong>ikke</strong> fortrydes.</p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Fortryd</button>
+                                                            <button type="button" class="btn btn-danger pointer" onclick="deletePas('<%= trainingPas.pasNumber %>')">Slet</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- BUTTON FOR SHOWING MODAL -->                                                
+                                            <button  class="editButtons<%= trainingPas.pasNumber %> btn btn-light text-danger float-right pointer p-1" type="button" style="display: none;" data-toggle="modal" data-target="#deleteTrainingPasModal<%= trainingPas.pasNumber %>">
+                                                <i class="fa fa-lg fa-times" aria-hidden="true"></i>
+                                            </button> 
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body pt-0">
+                                <% trainingPas.muscleGroups.forEach((muscleGroup) => { %>
+
+                                    <div id="muscleGroup<%= muscleGroup._id %>">
+
+                                        <h5 class="mt-4 text-capitalize">
+                                            <span onclick="deleteMuscleGroup('<%=trainingPas.pasNumber%>' , '<%= muscleGroup.name %>' , '<%=muscleGroup._id%>')" class="editButtons<%= trainingPas.pasNumber %>" style="display: none;">
+                                                <i class="fa fa-trash text-danger pointer" aria-hidden="true"></i>
+                                            </span> 
+                                            <%= muscleGroup.name %> 
+                                        </h5>
+                                        <div class="list-group list-unstyled" style="position: relative;">
+                                            <% muscleGroup.assignedWorkouts.forEach((userWorkout) => { %>
+                                                <!-- Div for the workout details -->
+                                                <div id="noEdit<%= userWorkout._id %>" class=" mt-1"> 
+                                                    <span class="editButtons<%= trainingPas.pasNumber %>" style="display: none;"> 
+                                                        <span onclick="deleteWorkout('<%=trainingPas.pasNumber%>' , '<%= muscleGroup.name %>' , '<%= userWorkout.name %>', '<%= userWorkout._id %>')"> 
+                                                            <i class="fa fa-trash text-danger pointer" aria-hidden="true"></i> 
+                                                        </span>
+                                                        <span onclick="toggleEdit('<%= userWorkout._id %>')">
+                                                            <i class="fa fa-pencil text-warning pointer" aria-hidden="true"></i>
+                                                        </span>
+                                                    </span>
+                                                    <span class="text-capitalize" id="name<%= userWorkout._id %>"> <%= userWorkout.name %> </span> 
+                                                    <span id="reps<%= userWorkout._id %>" class="float-right"> <%= userWorkout.reps %> gentagelser </span>
+                                                    <span id="saet<%= userWorkout._id %>" class="float-right mr-1">  <%= userWorkout.saet %> sæt af </span>
+                                                </div>
+                                                <!-- Div for the workout edit form -->
+                                                <div id="edit<%= userWorkout._id %>" style="display: none;" class="mt-1"> 
+                                                    <form id="form<%= userWorkout._id %>" class="form-inline" action="<%=user._id%>/update/workout/<%=userWorkout._id%>" type="POST">
+                                                        <div class="input-group">
+                                                            <select class="form-control text-capitalize" name="name">
+                                                                <% workouts.forEach((workout) => { %>
+                                                                    <% if(userWorkout.name === workout.name) { %>
+                                                                        <option class="text-capitalize" selected="true" value="<%= workout.name %>"><%= workout.name %></option>
+                                                                    <% } else { %>
+                                                                        <option class="text-capitalize" value="<%= workout.name %>"><%= workout.name %></option>
+                                                                    <% } %>
+                                                                <% }) %>
+                                                            </select>
+                                                            <input type="number" name="saet" class="form-control"  placeholder="Sæt">
+                                                            <input type="number" name="reps" class="form-control"  placeholder="Gentagelser">                                                          
+                                                            <button 
+                                                                type="button" 
+                                                                onclick="updateWorkout('<%=trainingPas.pasNumber%>' , '<%= muscleGroup.name %>' , '<%= userWorkout.name %>', '<%= userWorkout._id %>')" 
+                                                                class="btn btn-outline-primary pointer btn-sm">Gem
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <% }) %>
+                                            </div>
+                                        <!-- Div for add new workout form -->
+                                        <div style="display: none;" class="my-2 editButtons<%= trainingPas.pasNumber %>">                                                     
+                                            <form id="createExc<%= muscleGroup._id%>" class="form-inline" action="<%=user._id%>/create/workout" type="POST">
+                                                <div class="input-group">
+                                                    <select class="form-control text-capitalize" name="name">
+                                                        <% workouts.forEach((workout) => { %>
+                                                            <option class="text-capitalize" value="<%= workout.name %>"><%= workout.name %></option>
+                                                        <% }) %>
+                                                    </select>
+                                                    <input type="number" name="saet" class="form-control"  placeholder="Sæt">
+                                                    <input type="number" name="reps" class="form-control"  placeholder="Gentagelser">                                                          
+                                                    <button 
+                                                        type="button" 
+                                                        onclick="createWorkout('<%=trainingPas.pasNumber%>' , '<%= muscleGroup.name %>', '<%= muscleGroup._id %>')" 
+                                                        class="btn btn-outline-primary btn-sm pointer">Ny Øvelse
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <hr>
+                                    </div>
+                                <% }) %>
+                                    <!-- Add new musclegroup --> 
+                                    <form id="muscleGroup<%= trainingPas.pasNumber %>" class="form-inline editButtons<%= trainingPas.pasNumber %> mt-3" style="display: none" action="<%= user._id %>/create/musclegroup" method="post">
+                                        <div class="form-group">
+                                            <select class="form-control text-capitalize" name="muscleGroup">
+                                                <% muscleGroups.forEach((musclegroup) => { %>
+                                                    <option class="text-capitalize" value="<%= musclegroup%>"><%= musclegroup %></option>
+                                                <% }) %>
+                                            </select>
+                                            <input type="text" value="<%= trainingPas.pasNumber %>" style="display: none;" name="trainingPas">
+                                            <button onclick="createMuscleGroup(<%= trainingPas.pasNumber %>)" class="btn btn-outline-primary pointer ml-1">Ny Muskelgruppe</button>
+                                        </div>
+                                    </form> 
+                                </div>  
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* UPDATE */
+function updateWorkout(trainingPas, muscleGroup, workoutName, workoutId) {
+    $.ajax({
+    type: 'POST',
+    url: $("#form" + workoutId).attr("action"),
+    data: {
+        trainingPas: trainingPas,
+        muscleGroup: muscleGroup,
+        workoutName: workoutName,
+        formData: $("#form" + workoutId).serialize()
+    }, 
+
+    success: function(response) { 
+        // KAN KUN REDIGERE WORKOUT ÉN GANG, FEJLER VED ANDET FORSØG
+        /* $("#name" + workoutId).text(response.newWorkoutName);
+        $("#reps" + workoutId).text(response.newWorkoutReps + " gentagelser");
+        $("#saet" + workoutId).text(response.newWorkoutSaet + " sæt af");
+        $("#edit" + workoutId).hide();*/
+        location.reload();
+        }, 
+    });
+    document.cookie = trainingPas;
+    $("#form" + workoutId).find("input").val("");
+}
+
+/* DELETE */
+function deleteWorkout(trainingPas, muscleGroup, workoutName, workoutId) {
+    $.ajax({
+    type: 'POST',
+    url: '<%=user._id%>/delete/workout',
+    data: {
+        trainingPas: trainingPas,
+        muscleGroup: muscleGroup,
+        workoutName: workoutName,
+    }, 
+    success: function(response) { 
+        $("#noEdit" + workoutId).remove();
+        $("#edit" + workoutId).remove();
+        },
+    });
+}
+
+function deletePas(trainingPas) {
+        $.ajax({
+        type: 'POST',
+        url: '<%=user._id%>/delete/pas',
+        data: {
+            trainingPas: trainingPas,
+        }, 
+        success: function(response) { 
+            location.reload();
+        },
+        });
+}
+
+function deleteMuscleGroup(trainingPas, muscleGroup, muscleGroupId) {
+    $.ajax({
+    type: 'POST',
+    url: '<%=user._id%>/delete/musclegroup',
+    data: {
+        trainingPas: trainingPas,
+        muscleGroup: muscleGroup
+    }, 
+    success: function(response) { 
+        $("#muscleGroup" + muscleGroupId).remove();
+        //location.reload();
+    },
+    });
+}
+
+/* CREATE */
+function createWorkout(trainingPas, muscleGroup, muscleGroupId) {
+
+    const formData = $("#createExc" + muscleGroupId).serialize();
+    const formDataObject = JSON.parse('{"' + decodeURI(formData.replace(/&/g, "\",\"").replace(/=/g,"\":\"")) + '"}');
+
+    if(formDataObject.reps && formDataObject.saet) {
+        $.ajax({
+        type: 'POST',
+        url: '<%= user._id %>/create/workout',
+        data: {
+            trainingPas: trainingPas,
+            muscleGroupId: muscleGroup,
+            formData: formDataObject
+        },
+        success: function(response) { 
+            location.reload();
+            }
+        });
+    } else {
+        alert("Udfyld venligst reps og set for øvelsen");
+    }
+
+}
+
+function createPas(){
+    $.ajax({
+    type: 'POST',
+    url: '<%= user._id %>/create/trainingpas',
+    data: {}, 
+    success: function(response) { 
+        location.reload();
+        }
+    });
+}
+
+function createMuscleGroup(trainingPas) {
+    $.ajax({
+    type: 'POST',
+    url: $("#muscleGroup" + trainingPas).attr("action"),
+    data: {
+        trainingPas: trainingPas,
+        formData: $("#muscleGroup" + trainingPas).serialize()
+    }, 
+    success: function(response) { 
+        location.reload();
+        }
+    });
+}
+
+
+</script>

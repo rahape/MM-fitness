@@ -1,0 +1,53 @@
+<% include partials/header %>
+    <script>
+        var socket = io();
+        $("#inbox").addClass("active");
+        $("#title").text("Indbakke");
+
+        // User send message to server
+        function userMessage(userId){
+            const message = $("#message").val();
+            $("#message").val("");
+
+            $("#messageDiv").append("<p> <small> Mig - </small>" + message + "</p>")
+
+            socket.emit("from user to server", {
+                message: message,
+                userId: userId
+            });
+        }
+
+        // User recieving message from server
+        socket.on("from server to user", (data) => {
+            if(data.userId === '<%= user._id %>'){
+                $("#messageDiv").append("<p> <small> Mikael - </small>" + data.message + "</p>");
+            }
+        });
+        
+    </script>
+
+    <!-- Messages -->
+    <div class="container">
+        <div id="messageDiv">
+        <% user.messages.forEach((message) => { %>
+            <% if(message.fromUser === true) { %>
+                    <p> <small> Mig - </small> <%= message.message %> </p>
+                <% } else { %>
+                    <p> <small> Mikael - </small> <%= message.message %> </p>                    
+                <% } %>
+            <% }) %>
+        </div>
+    </div>
+
+    <!-- tekstfelt & send-knap -->
+    <div>
+        <div class="d-flex flex-column justify-content-end" style="min-height: calc(100vh - 55px); align-items: flex-end;">
+            <div class="input-group stickyBottom">
+                <input id="message" class="form-control" type="text" placeholder="skriv en besked...">
+                <button class="btn btn-primary" onclick="userMessage('<%= user._id %>')"><i class="fa fa-telegram fa-lg"></i></button>
+            </div> 
+        </div>
+    </div>
+
+
+<% include partials/footer %>

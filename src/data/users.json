@@ -1,0 +1,84 @@
+[
+    {
+        "_id": "821039bf-6aeb-4e57-8027-b29c7c12a1d8",
+        "name": "Johnny Reimer",
+        "email": "mrhest@hotmail.com",
+        "password": "shitbag",
+        "avatarURL": "google.images.someguy",
+        "weightStats": {
+            "currentWeight": "322",
+            "startWeight": "420",
+            "weightProgress": "-22",
+            "allWeights": [
+                {
+                    "date": "01-01-2017",
+                    "weight": "100"
+                },
+                {
+                    "date": "07-01-2017",
+                    "weight": "98"
+                },
+                {
+                    "date": "14-01-2017",
+                    "weight": "97"
+                },
+                {
+                    "date": "23-01-2017",
+                    "weight": "93"
+                }
+            ]
+        },
+        "trainingStats": {
+            "assignedWorkouts": [
+                {
+                    "name": "pushups",
+                    "reps": "10",
+                    "set": "3",
+                    "tempo": "2010",
+                    "workload": ""
+                },
+                {
+                    "name": "squats",
+                    "reps": "20",
+                    "set": "5",
+                    "tempo": "2010",
+                    "workload": "30"
+                }
+            ]
+        },
+        "foodStats": {
+            "totalCalories": "3000",
+            "mealPlan": [
+                {
+                    "name": "havregryn",
+                    "description": "gryn med havre",
+                    "recipe": "",
+                    "calories": "500",
+                    "carbohydrates": "30",
+                    "fat": "40",
+                    "protein": "30"
+                },
+                {
+                    "name": "havregryn",
+                    "description": "gryn med havre",
+                    "recipe": "",
+                    "calories": "500",
+                    "carbohydrates": "30",
+                    "fat": "40",
+                    "protein": "30"
+                }
+            ]
+        },
+        "messages": [
+            {
+                "date": "01-03-2016",
+                "content": "hello man horse"
+            },
+            {
+                "date": "02-03-2016",
+                "content": "hello horse man"
+            }
+        ]
+        
+    }
+]

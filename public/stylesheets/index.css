@@ -1,0 +1,48 @@
+html, body {
+	height: 100%;
+	min-height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.footer {
+	position: relative;
+	bottom: 0;
+}
+
+.stickyBottom {
+	position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.vertical-line {
+	border-right: 1px solid rgba(220,220,220, .8);
+}
+
+.pointer {
+	cursor: pointer;
+}
+
+.isDisabled {
+	opacity: 0.5;
+}
+
+.opCard {
+	background-color: rgba(255, 255, 255, 0.92);
+}
+
+.biggerText {
+	font-size: 24px;
+	font-weight: bold;
+}
+
+.hundredHeight {
+	min-height: 100%;
+}
+
+#loginBackground {
+	background-image: url("https://static.pexels.com/photos/685530/pexels-photo-685530.jpeg");
+	background-size:cover;
+}
+

@@ -1,0 +1,17 @@
+{
+	"port": "8080",
+	"service": {
+		"darkSkyApi": {
+			"baseUrl": "https://api.darksky.net/forecast/",
+			"apiSecret": "fb37b2ee99bef683d6bfcd15f0872db2"
+		}
+	},
+	"mongo": {
+		"port":"27017"
+	},
+	"mongoose": {
+		"options": {
+			"useMongoClient": "true"
+		}
+	}
+}

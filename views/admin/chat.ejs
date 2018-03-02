@@ -1,0 +1,55 @@
+<% include partials/header %>
+<!-- <link href="stylesheets/inbox.css" rel="stylesheet" type="text/css"> -->
+    <script>
+        var socket = io();
+        $("#inbox").addClass("active");
+        $("#title").text("Indbakke");
+
+        // Admin send message to server
+        function adminMessage (userId) {
+            const message = $("#message").val();
+            $("#message").val("");
+
+            $("#messageDiv").append("<p> <small> Mikael </small> - " + message + " </p>");
+            
+            socket.emit("from admin to server", {
+                message: message,
+                userId: userId
+            });
+        }
+
+        // Admin recieving message from server
+        socket.on("from server to admin", (data) => {
+            $("#messageDiv").append(
+                "<p> <small> <%= user.firstName %> - </small>" + data.message + "</p>"
+            );
+        });
+
+    </script>
+
+    <style>
+        p:not(small) {
+            font-size: 20px;
+        }
+    </style>
+
+    <!-- Messages  -->
+     <div id="messageDiv" class="container">
+        <% user.messages.forEach((message) => { %>
+            <% if(message.fromUser === false) { %>    
+                <p> <small> Mikael - </small> <%= message.message %></p>        
+            <% } else { %>
+                <p> <small> <%= user.firstName  %> - </small> <%= message.message %></p>  
+            <% } %>
+        <% }) %>
+    </div>
+
+    <!-- tekstfelt & send-knap -->
+    <div>
+        <div class="d-flex flex-column justify-content-end" style="min-height: calc(100vh - 55px); align-items: flex-end;">
+            <div class="input-group stickyBottom">
+                <input id="message" class="form-control" type="text" placeholder="skriv en besked...">
+                <button class="btn btn-primary" onclick="adminMessage('<%= user._id %>')"><i class="fa fa-telegram fa-lg"></i></button>
+            </div> 
+        </div>
+    </div>

@@ -1,2 +1,4 @@
-# MM-fitness
-Fitness application for the final project of my AP degree in computer science
+# MM-Fitness
+
+Final project for Copenhagen School of Design and Technology.
+"# MM-fitness" 
